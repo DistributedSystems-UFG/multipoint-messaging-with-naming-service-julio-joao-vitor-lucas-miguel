@@ -1,0 +1,10 @@
+PEER_UDP_PORT = 6789
+PEER_TCP_PORT = 5679
+N = 1   # Number of peers
+SERVER_ADDR ='192.168.0.193'
+SERVER_PORT = 5678
+GROUPMNGR_ADDR = '192.168.0.193'
+GROUPMNGR_TCP_PORT = 5680
+PEER1_ADDR = '192.168.0.193'
+filename = f'shared_file_peer_.txt'
+
