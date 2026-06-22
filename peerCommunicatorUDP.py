@@ -6,6 +6,7 @@ import time
 import pickle
 from requests import get
 import os
+from clientNameServer import *
 
 #handShakes = [] # not used; only if we need to check whose handshake is missing
 
@@ -84,17 +85,20 @@ def registerWithGroupManager():
   clientSock.close()
 
 def getListOfPeers():
-  clientSock = socket(AF_INET, SOCK_STREAM)
-  print ('Connecting to group manager: ', (GROUPMNGR_ADDR,GROUPMNGR_TCP_PORT))
-  clientSock.connect((GROUPMNGR_ADDR,GROUPMNGR_TCP_PORT))
-  req = {"op":"list"}
-  msg = pickle.dumps(req)
-  print ('Getting list of peers from group manager: ', req)
-  clientSock.send(msg)
-  msg = clientSock.recv(2048)
-  PEERS = pickle.loads(msg)
-  print ('Got list of peers: ', PEERS)
-  clientSock.close()
+  client = NameServiceClient()
+  PEERS = client.discover("peer")
+  print(PEERS)
+  #clientSock = socket(AF_INET, SOCK_STREAM)
+  #print ('Connecting to group manager: ', (GROUPMNGR_ADDR,GROUPMNGR_TCP_PORT))
+  #clientSock.connect((GROUPMNGR_ADDR,GROUPMNGR_TCP_PORT))
+  #req = {"op":"list"}
+  #msg = pickle.dumps(req)
+  #print ('Getting list of peers from group manager: ', req)
+  #clientSock.send(msg)
+  #msg = clientSock.recv(2048)
+  #PEERS = pickle.loads(msg)
+  #print ('Got list of peers: ', PEERS)
+  #clientSock.close()
   return PEERS
 
 class MsgHandler(threading.Thread):
@@ -174,7 +178,16 @@ def waitToStart():
   return (myself,nMsgs)
 
 # From here, code is executed when program starts:
-registerWithGroupManager()
+#registerWithGroupManager()
+client = NameServiceClient()
+print(client.bind("peer1", "tcp://192.168.1.81:5679"))
+print(client.bind("peer2", "tcp://192.168.1.81:5679"))
+print(client.bind("peer3", "tcp://192.168.1.81:5679"))
+print(client.register("peer1", "peer"))
+print(client.register("peer2", "peer"))
+print(client.register("peer3", "peer"))
+print(client.discover("peer"))
+print(client.lookup("peer1"))
 while 1:
   print('Waiting for signal to start...')
   (myself, nMsgs) = waitToStart()

@@ -3,7 +3,7 @@ import pickle
 from constMP import *
 import time
 import sys
-
+from clientNameServer import *
 
 class comparisonServer:
 	def __init__(self):
@@ -17,14 +17,17 @@ class comparisonServer:
 		cont = 1
 		while 1:
 			nMsgs = self.promptUser()
-			clientSock = socket(AF_INET, SOCK_STREAM)
-			clientSock.connect((GROUPMNGR_ADDR,GROUPMNGR_TCP_PORT))
-			req = {"op":"list"}
-			msg = pickle.dumps(req)
-			clientSock.send(msg)
-			msg = clientSock.recv(2048)
-			clientSock.close()
-			peerList = pickle.loads(msg)
+			client = NameServiceClient()
+			client.bind("comparisonServer", "tcp://192.168.1.50:80")
+			peerList = client.discover("peer")
+			#clientSock = socket(AF_INET, SOCK_STREAM)
+			#clientSock.connect((GROUPMNGR_ADDR,GROUPMNGR_TCP_PORT))
+			#req = {"op":"list"}
+			#msg = pickle.dumps(req)
+			#clientSock.send(msg)
+			#msg = clientSock.recv(2048)
+			#clientSock.close()
+			#peerList = pickle.loads(msg)
 			print("List of Peers: ", peerList)
 			self.startPeers(peerList,nMsgs)
 			if nMsgs != 0:
