@@ -20,6 +20,8 @@ class comparisonServer:
 			client = NameServiceClient()
 			client.bind("comparisonServer", "tcp://192.168.1.50:80")
 			peerList = client.discover("peer")
+			enderecos = [p["endereco"] for p in peerList["processos"]]
+			print(enderecos)
 			#clientSock = socket(AF_INET, SOCK_STREAM)
 			#clientSock.connect((GROUPMNGR_ADDR,GROUPMNGR_TCP_PORT))
 			#req = {"op":"list"}
@@ -28,8 +30,8 @@ class comparisonServer:
 			#msg = clientSock.recv(2048)
 			#clientSock.close()
 			#peerList = pickle.loads(msg)
-			print("List of Peers: ", peerList)
-			self.startPeers(peerList,nMsgs)
+			print("List of Peers: ", enderecos)
+			self.startPeers(enderecos,nMsgs)
 			if nMsgs != 0:
 				print('Now, wait for the message logs from the communicating peers...')
 				self.waitForLogsAndCompare(nMsgs)
@@ -54,8 +56,10 @@ class comparisonServer:
 		# Connect to each of the peers and send the 'initiate' signal:
 		peerNumber = 0
 		for peer in peerList:
+			limpo = peer.replace("tcp://", "") # Fica: '192.168.1.81:5679'
+			ip, porta = limpo.split(":")
 			clientSock = socket(AF_INET, SOCK_STREAM)
-			clientSock.connect((peer, PEER_TCP_PORT))
+			clientSock.connect((ip,int(porta)))
 			msg = (peerNumber,nMsgs)
 			msgPack = pickle.dumps(msg)
 			clientSock.send(msgPack)

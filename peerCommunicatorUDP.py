@@ -87,6 +87,8 @@ def registerWithGroupManager():
 def getListOfPeers():
   client = NameServiceClient()
   PEERS = client.discover("peer")
+  enderecos = [p["endereco"] for p in PEERS["processos"]]
+  print(enderecos)
   print(PEERS)
   #clientSock = socket(AF_INET, SOCK_STREAM)
   #print ('Connecting to group manager: ', (GROUPMNGR_ADDR,GROUPMNGR_TCP_PORT))
@@ -99,7 +101,7 @@ def getListOfPeers():
   #PEERS = pickle.loads(msg)
   #print ('Got list of peers: ', PEERS)
   #clientSock.close()
-  return PEERS
+  return enderecos
 
 class MsgHandler(threading.Thread):
   def __init__(self, sock):
@@ -180,12 +182,12 @@ def waitToStart():
 # From here, code is executed when program starts:
 #registerWithGroupManager()
 client = NameServiceClient()
-print(client.bind("peer1", "tcp://192.168.1.81:5679"))
-print(client.bind("peer2", "tcp://192.168.1.81:5679"))
-print(client.bind("peer3", "tcp://192.168.1.81:5679"))
+print(client.bind("peer1", "tcp://192.168.40.194:5679"))
+#print(client.bind("peer2", "tcp://192.168.1.81:5679"))
+#print(client.bind("peer3", "tcp://192.168.1.81:5679"))
 print(client.register("peer1", "peer"))
-print(client.register("peer2", "peer"))
-print(client.register("peer3", "peer"))
+#print(client.register("peer2", "peer"))
+#print(client.register("peer3", "peer"))
 print(client.discover("peer"))
 print(client.lookup("peer1"))
 while 1:
@@ -208,10 +210,13 @@ while 1:
   # To do: Must continue sending until it gets a reply from each process
   #        Send confirmation of reply
   for addrToSend in PEERS:
-    print('Sending handshake to ', addrToSend)
-    msg = ('READY', myself)
-    msgPack = pickle.dumps(msg)
-    sendSocket.sendto(msgPack, (addrToSend,PEER_UDP_PORT))
+  	limpo = addrToSend.replace("tcp://", "") # Fica: '192.168.1.81:5679'
+  	print("l: " + limpo)
+  	ip, porta = limpo.split(":")
+  	print('Sending handshake to ', addrToSend)
+  	msg = ('READY', myself)
+  	msgPack = pickle.dumps(msg)
+  	sendSocket.sendto(msgPack, (ip,PEER_UDP_PORT))
     #data = recvSocket.recvfrom(128) # Handshadke confirmations have not yet been implemented
 
   print('Main Thread: Sent all handshakes. handShakeCount=', str(handShakeCount))
@@ -226,11 +231,17 @@ while 1:
     msg = (myself, "Escreva:Voce esta perdendo os lembretes do Duo :2")#msg = (myself, msgNumber)
     msgPack = pickle.dumps(msg)
     for addrToSend in PEERS:
-      sendSocket.sendto(msgPack, (addrToSend,PEER_UDP_PORT))
+      limpo = addrToSend.replace("tcp://", "") # Fica: '192.168.1.81:5679'
+      print("l: " + limpo)
+      ip, porta = limpo.split(":")
+      sendSocket.sendto(msgPack, (ip,PEER_UDP_PORT))
       print('Sent message ' + str(msgNumber))
 
   # Tell all processes that I have no more messages to send
   for addrToSend in PEERS:
+    limpo = addrToSend.replace("tcp://", "") # Fica: '192.168.1.81:5679'
+    print("l: " + limpo)
+    ip, porta = limpo.split(":")
     msg = (-1,-1)
     msgPack = pickle.dumps(msg)
-    sendSocket.sendto(msgPack, (addrToSend,PEER_UDP_PORT))
+    sendSocket.sendto(msgPack, (ip,PEER_UDP_PORT))
