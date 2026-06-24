@@ -2,7 +2,7 @@ import zmq
 import json
 
 class NameServiceClient:
-    def __init__(self, endpoint="tcp://localhost:5555"):
+    def __init__(self, endpoint="tcp://192.168.40.203:5555"):
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.REQ)
         self.socket.connect(endpoint)

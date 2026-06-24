@@ -68,7 +68,7 @@ def msg_command(msg):
 		
 		 
 def get_public_ip():
-  ipAddr = PEER1_ADDR					#get('https://api.ipify.org').content.decode('utf8')
+  ipAddr = PEER1_ADDR	#get('https://api.ipify.org').content.decode('utf8')
   print('My public IP address is: {}'.format(ipAddr))
   return ipAddr
 
@@ -158,7 +158,15 @@ class MsgHandler(threading.Thread):
     # Send the list of messages to the server (using a TCP socket) for comparison
     print('Sending the list of messages to the server for comparison...')
     clientSock = socket(AF_INET, SOCK_STREAM)
-    clientSock.connect((SERVER_ADDR, SERVER_PORT))
+    client = NameServiceClient()
+    compServer = client.lookup("comparisonServer")
+    endereco = compServer["endereco"]
+    print(endereco)
+    print(compServer)
+    limpo = endereco.replace("tcp://", "") # Fica: '192.168.1.81:5679'
+    print("l: " + limpo)
+    ip, porta = limpo.split(":")
+    clientSock.connect((ip, int(porta)))
     msgPack = pickle.dumps(logList)
     clientSock.send(msgPack)
     clientSock.close()
@@ -182,7 +190,7 @@ def waitToStart():
 # From here, code is executed when program starts:
 #registerWithGroupManager()
 client = NameServiceClient()
-print(client.bind("peer1", "tcp://192.168.40.194:5679"))
+print(client.bind("peer1", "tcp://192.168.40.203:5679"))
 #print(client.bind("peer2", "tcp://192.168.1.81:5679"))
 #print(client.bind("peer3", "tcp://192.168.1.81:5679"))
 print(client.register("peer1", "peer"))

@@ -18,7 +18,8 @@ class comparisonServer:
 		while 1:
 			nMsgs = self.promptUser()
 			client = NameServiceClient()
-			client.bind("comparisonServer", "tcp://192.168.1.50:80")
+			client.bind("comparisonServer", "tcp://192.168.40.203:5678")
+			print(client.register("comparisonServer", "server"))
 			peerList = client.discover("peer")
 			enderecos = [p["endereco"] for p in peerList["processos"]]
 			print(enderecos)
